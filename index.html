@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Giftmas — Christmas Giving on Solana</title>
+<style>
+:root {
+  --site-primary: #b92735;
+  --site-secondary: #104b39;
+  --site-background: #f8f3e7;
+  --site-on-primary: #ffffff;
+  --site-on-secondary: #ffffff;
+  --site-on-background: #18372d;
+  --site-font-body: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --site-font-heading: Georgia, "Times New Roman", serif;
+  --site-heading-scale: 1;
+  --site-spacing-scale: 1;
+  --site-radius-scale: 1;
+  --site-decoration-opacity: 1;
+  color-scheme: light dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--site-font-body); background: var(--site-background); color: var(--site-on-background); }
+#app { min-height: 100vh; width: 100%; border-radius: 0; background-color: var(--site-background); color: var(--site-on-background); overflow: hidden; }
+a { color: inherit; }
+.nav { display:flex; align-items:center; justify-content:space-between; gap:16px; padding: calc(18px * var(--site-spacing-scale)) max(5vw, 20px); background: var(--site-secondary); color: var(--site-on-secondary); }
+.brand { display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.04em; }
+.brand-mark { display:grid; place-items:center; width:42px; height:42px; border-radius:50%; background:#f1d48c; color:#7e1f2b; font-size:24px; }
+.nav-links { display:flex; gap:22px; align-items:center; font-size:14px; }
+.nav-links a { text-decoration:none; opacity:.92; }
+.pill { border:1px solid rgba(255,255,255,.45); border-radius:999px; padding:10px 15px; text-decoration:none; font-weight:750; }
+.hero { position:relative; display:grid; grid-template-columns:1.05fr .95fr; gap:30px; align-items:center; padding: clamp(44px,8vw,100px) max(5vw,20px); color:#fff8e8; background: radial-gradient(ellipse at 75% 25%, #27765b 0, transparent 35%), linear-gradient(135deg,#0b352a,#124d3b 60%,#0a2c24); }
+.hero:before { content:"❄  ✦  ❄   ✧     ❄"; position:absolute; inset:20px 4% auto auto; font-size:clamp(15px,2vw,26px); letter-spacing:15px; opacity:calc(.25 * var(--site-decoration-opacity)); pointer-events:none; }
+.eyebrow { display:inline-block; color:#f2d58e; font-size:12px; font-weight:900; text-transform:uppercase; letter-spacing:.18em; margin-bottom:16px; }
+h1,h2,h3 { font-family:var(--site-font-heading); }
+h1 { font-size:calc(clamp(42px,6.5vw,78px) * var(--site-heading-scale)); line-height:.98; margin:0 0 20px; letter-spacing:-.045em; }
+.hero p { max-width:550px; color:#d8e9df; line-height:1.75; font-size:clamp(15px,1.5vw,18px); }
+.actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:26px; }
+.button { display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:12px 18px; border-radius:calc(12px * var(--site-radius-scale)); font-weight:850; text-decoration:none; border:1px solid transparent; cursor:pointer; }
+.button.primary { background:var(--site-primary); color:#fff; box-shadow:0 8px 20px #0002; }
+.button.secondary { border-color:#b9d3c3; color:#fff8e8; background:#ffffff0c; }
+.santa-art { min-height:320px; display:grid; place-items:center; position:relative; }
+.moon { position:absolute; width:min(310px,75%); aspect-ratio:1; border-radius:50%; background:radial-gradient(circle at 35% 30%,#fff5d4,#e7c87a 60%,#c58d42); box-shadow:0 0 80px #e7c87a25; }
+.sleigh { position:relative; z-index:1; text-align:center; font-size:clamp(90px,15vw,160px); filter:drop-shadow(0 16px 10px #001c1470); transform:rotate(-7deg); }
+.gift-float { position:absolute; z-index:2; font-size:clamp(34px,5vw,52px); filter:drop-shadow(0 8px 8px #001c1470); }
+.gift-one { right:6%; bottom:12%; transform:rotate(12deg); }
+.gift-two { left:8%; top:13%; transform:rotate(-12deg); }
+section { padding: clamp(44px,7vw,76px) max(5vw,20px); }
+.section-head { max-width:680px; margin:0 auto 32px; text-align:center; }
+.section-head h2 { font-size:calc(clamp(30px,4vw,46px) * var(--site-heading-scale)); margin:0 0 12px; color:#154535; }
+.section-head p { line-height:1.7; color:#53685e; margin:0; }
+.cards { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; max-width:1100px; margin:auto; }
+.card { background:light-dark(#fffdf7,#1d2b25); color:light-dark(#18372d,#f3f0e6); border:1px solid light-dark(#e7deca,#344b40); border-radius:calc(18px * var(--site-radius-scale)); padding:calc(24px * var(--site-spacing-scale)); }
+.card .emoji { font-size:30px; }
+.card h3 { font-size:23px; margin:14px 0 8px; }
+.card p { margin:0; line-height:1.7; color:light-dark(#59695f,#c4d3c9); font-size:14px; }
+.tokenomics { background:#eee5d1; }
+.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; max-width:850px; margin:28px auto 0; }
+.stat { padding:22px 14px; text-align:center; background:#fffaf0; border:1px solid #e3d5b7; border-radius:calc(14px * var(--site-radius-scale)); }
+.stat strong { display:block; font-size:clamp(21px,3vw,30px); color:#a52331; }
+.stat span { display:block; margin-top:7px; font-size:12px; color:#53685e; }
+.notice { max-width:850px; margin:18px auto 0; font-size:12px; line-height:1.65; color:#58685d; text-align:center; }
+.gift-lab { background:#e7f0e7; }
+.gift-panel { max-width:900px; margin:auto; padding:clamp(20px,4vw,34px); border:1px solid #cbdcc9; border-radius:calc(20px * var(--site-radius-scale)); background:#fffdf7; }
+.gift-panel h3 { margin:0 0 10px; font-size:24px; }
+.gift-panel p { line-height:1.65; color:#53685e; }
+.gift-form { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:22px; }
+.gift-form label { display:grid; gap:7px; font-size:13px; font-weight:800; }
+.gift-form input,.gift-form select,.gift-form textarea { width:100%; padding:12px; border:1px solid #cbd7ca; border-radius:10px; background:#fff; color:#18372d; font:inherit; }
+.gift-form .wide { grid-column:1 / -1; }
+.gift-status { padding:14px; margin-top:14px; border-radius:10px; background:#edf4ea; color:#244e38; font-size:13px; line-height:1.6; }
+.gift-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+.gift-small { font-size:12px; }
+.devnet-guide { max-width:900px; margin:16px auto 0; padding:20px; border:1px solid #d8c48e; border-radius:14px; background:#fff7df; color:#3d422b; }
+.devnet-guide h3 { margin:0 0 8px; font-size:22px; }
+.devnet-guide p { margin:8px 0; line-height:1.65; }
+.devnet-steps { display:grid; gap:10px; margin:14px 0; padding:0; list-style:none; counter-reset:devstep; }
+.devnet-steps li { counter-increment:devstep; display:flex; gap:10px; align-items:flex-start; line-height:1.6; font-size:14px; }
+.devnet-steps li:before { content:counter(devstep); flex:0 0 28px; height:28px; display:grid; place-items:center; border-radius:50%; background:#15513d; color:#fff; font-weight:900; }
+.devnet-links { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
+.devnet-label { display:inline-block; padding:5px 9px; border-radius:999px; background:#f2dfaa; color:#634b12; font-size:11px; font-weight:900; letter-spacing:.06em; text-transform:uppercase; }
+.wallet-row { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin:16px 0; }
+.wallet-state { font-size:13px; line-height:1.5; color:#244e38; overflow-wrap:anywhere; }
+.button:disabled { opacity:.55; cursor:not-allowed; }
+.roadmap { background:#fffaf0; }
+.roadmap-list { max-width:800px; margin:auto; display:grid; gap:14px; }
+.phase { display:flex; gap:16px; align-items:flex-start; padding:20px; border:1px solid #e8dfcc; border-radius:calc(14px * var(--site-radius-scale)); background:#fff; }
+.phase-num { flex:0 0 42px; height:42px; display:grid; place-items:center; border-radius:50%; background:#15513d; color:white; font-weight:900; }
+.phase h3 { margin:0 0 5px; font-size:21px; }
+.phase p { margin:0; line-height:1.6; color:#59695f; font-size:14px; }
+.faq { max-width:820px; margin:auto; }
+details { border-bottom:1px solid #ddd4c1; padding:17px 0; }
+summary { cursor:pointer; font-weight:800; }
+details p { color:#53685e; line-height:1.7; }
+footer { padding:32px max(5vw,20px); background:#0b3026; color:#d5e5d9; text-align:center; font-size:12px; line-height:1.8; }
+footer strong { color:#f1d48c; }
+@media (max-width:720px) { .nav-links a:not(.pill) { display:none; } .hero { grid-template-columns:1fr; text-align:center; } .hero p { margin-left:auto; margin-right:auto; } .actions { justify-content:center; } .santa-art { min-height:240px; } .cards { grid-template-columns:1fr; } .stats { grid-template-columns:1fr; } .gift-form { grid-template-columns:1fr; } .gift-form .wide { grid-column:auto; } }
+@media (prefers-color-scheme: dark) { body { background:#101d17; } .section-head h2 { color:#d6e8dc; } .section-head p { color:#b9cbbf; } .tokenomics { background:#17271f; } .stat { background:#20372b; border-color:#3c5646; } .stat span,.notice { color:#bdcfc2; } .roadmap { background:#101d17; } .phase { background:#1b2d23; border-color:#344c3c; } .phase p, details p { color:#bdcfc2; } details { border-color:#344c3c; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="nav">
+    <div class="brand"><span class="brand-mark">🎅</span><span>GIFTMAS</span></div>
+    <nav class="nav-links" aria-label="Main navigation"><a href="#about">About</a><a href="#token">Token</a><a href="#roadmap">Roadmap</a><a class="pill" href="#community">Community ↗</a></nav>
+  </header>
+  <main>
+    <section class="hero">
+      <div>
+        <span class="eyebrow">✨ A little magic. A lot of giving.</span>
+        <h1>Give a Little Magic. Share a Lot of Joy.</h1>
+        <p>Meet Giftmas, a proposed Solana-based Christmas community token inspired by Santa, digital gifts, and the spirit of giving. Celebrate together while we build the idea transparently.</p>
+        <div class="actions"><a class="button primary" href="#token">Explore the Token 🎁</a><a class="button secondary" href="#community">Join the Community</a></div>
+      </div>
+      <div class="santa-art" aria-label="Festive Santa and gifts illustration"><div class="moon"></div><div class="sleigh">🎅</div><span class="gift-float gift-one">🎁</span><span class="gift-float gift-two">🎄</span></div>
+    </section>
+    <section id="about">
+      <div class="section-head"><span class="eyebrow" style="color:#a52331">THE CHRISTMAS SPIRIT</span><h2>More cheer. More community.</h2><p>A playful seasonal project built around the joy of sharing. Explore the concept, follow the build, and help shape what comes next.</p></div>
+      <div class="cards">
+        <article class="card"><div class="emoji">🎅</div><h3>Santa-powered spirit</h3><p>A friendly festive identity made for holiday memes, seasonal art, and community challenges.</p></article>
+        <article class="card"><div class="emoji">🎁</div><h3>Gift-inspired fun</h3><p>Potential future digital gifts and collectibles, subject to development and transparent rules.</p></article>
+        <article class="card"><div class="emoji">❄️</div><h3>Community first</h3><p>Build in public, share updates, and make every milestone clear to supporters.</p></article>
+      </div>
+    </section>
+    <section class="tokenomics" id="token">
+      <div class="section-head"><span class="eyebrow" style="color:#a52331">TOKEN DETAILS</span><h2>A transparent start</h2><p>Giftmas is a proposed Solana token concept. These details are a planning draft, not confirmation of a deployed or launched token.</p></div>
+      <div class="stats"><div class="stat"><strong>GFTM</strong><span>Suggested ticker — check availability</span></div><div class="stat"><strong>Solana</strong><span>Planned blockchain</span></div><div class="stat"><strong>TBD</strong><span>Total supply — to be decided</span></div></div>
+      <p class="notice">Token address: not deployed yet. The project concept combines community, festive digital gifting, and potential charity initiatives. Any donation or gift program needs transparent funding, eligibility rules, and appropriate legal review. No profit or reward is promised.</p>
+    </section>
+    <section class="gift-lab" id="gifting">
+      <div class="section-head"><span class="eyebrow" style="color:#a52331">ON-CHAIN GIFTING</span><h2>Send a little Christmas magic</h2><p>Plan gifts in SOL or Giftmas tokens. A limited SOL test-transfer flow is available on Solana Devnet only; mainnet gifting stays disabled. Giftmas SPL-token transfers require a deployed and independently verified token mint.</p></div>
+      <div class="gift-panel">
+        <h3>🎁 Choose your Christmas gift</h3>
+        <p>The planned flow supports native SOL and Giftmas (GFTM) token gifts. Wallet connection displays your public address. The separate test button below can submit a small SOL transfer to Solana Devnet after simulation and explicit wallet signing; it does not enable mainnet payments. GFTM gifting stays unavailable until a real mint address exists and is verified; a ticker or token name alone is not proof of the correct asset.</p>
+        <div class="wallet-row"><button class="button primary" id="connect-wallet" type="button">Connect Solana Wallet</button><button class="button" id="disconnect-wallet" type="button" style="border:1px solid #b8c7b8" disabled>Disconnect</button><span class="wallet-state" id="wallet-state" role="status" aria-live="polite">Wallet not connected. Use a trusted wallet extension or compatible provider; this page never needs your recovery phrase.</span></div>
+        <form id="gift-form" class="gift-form">
+          <label>Gift asset
+            <select id="asset" name="asset"><option value="SOL">SOL — available for prototype preview</option><option value="GFTM" disabled>Giftmas (GFTM) — unavailable until mint verification</option></select>
+          </label>
+          <label>Gift amount
+            <input id="amount" name="amount" type="number" min="0.001" max="1000000" step="0.001" placeholder="0.05" required>
+          </label>
+          <label class="wide">Recipient Solana wallet address
+            <input id="recipient" name="recipient" autocomplete="off" placeholder="Paste recipient's public wallet address" required minlength="32" maxlength="44" pattern="[1-9A-HJ-NP-Za-km-z]{32,44}">
+          </label>
+          <label>Gift message (optional)
+            <input id="message" name="message" maxlength="120" placeholder="Merry Christmas! 🎄">
+          </label>
+          <div class="wide"><button class="button primary" type="submit">Review Christmas Gift</button></div>
+        </form>
+        <div id="gift-status" class="gift-status" role="status" aria-live="polite">Prototype only: enter a recipient and amount to preview a SOL gift. Wallet connection is for address display only; no transaction can be sent from this page.</div>
+        <div class="gift-status" style="margin-top:12px;border:1px solid #d8c48e;background:#fff7df;color:#3d422b">
+          <strong>🧪 Optional Devnet test transfer</strong><br>
+          This separate test button can submit SOL only to Solana Devnet using the Devnet RPC. It cannot submit through this code to mainnet. Use test SOL with no monetary value, keep the amount at or below 0.1 SOL, and confirm your wallet is set to Devnet. Live mainnet gifting and GFTM transfers remain disabled.
+          <label style="display:flex;gap:9px;align-items:flex-start;margin-top:12px;font-weight:700"><input id="devnet-confirm" type="checkbox" style="width:auto;margin-top:3px"> I understand this is a Devnet-only test transfer and I have checked my wallet network and recipient address.</label>
+          <div class="gift-actions"><button class="button primary" id="devnet-send" type="button" disabled>Send Devnet Test Gift</button></div>
+          <p id="devnet-status" class="gift-small" role="status" aria-live="polite">First connect your wallet and review a SOL gift above. The test transfer button stays disabled until the preview and confirmation checkbox are ready.</p>
+        </div>
+        <div class="gift-actions"><a class="button" style="border:1px solid #b8c7b8" href="https://explorer.solana.com/" target="_blank" rel="noopener noreferrer">Open Solana Explorer ↗</a><a class="button" style="border:1px solid #b8c7b8" href="https://solana.com/" target="_blank" rel="noopener noreferrer">Learn about Solana ↗</a></div>
+        <div class="gift-status"><strong>Safe launch checklist</strong><br>1. Connect a wallet through its official provider (never ask for a seed phrase).<br>2. Confirm the selected network is Solana mainnet or clearly labeled devnet during testing.<br>3. Validate the recipient and asset; verify the GFTM mint address from an official project source before enabling token transfers.<br>4. Build and simulate the transaction, show recipient, exact amount, token mint (for GFTM), and estimated network fee.<br>5. Require the sender to review and sign in their own wallet, then confirm the transaction signature on Solana Explorer.<br>6. Handle rejection, insufficient balance, stale quotes, and failed confirmations without claiming success.</div>
+        <div class="devnet-guide" id="devnet-test-process">
+          <span class="devnet-label">Next milestone · test network only</span>
+          <h3>🧪 Devnet SOL gifting test process</h3>
+          <p>Use this staged checklist before enabling any real transfer. Devnet SOL is for testing and has no intended monetary value. This guide does not itself send a transaction, and the current gift form remains preview-only.</p>
+          <ol class="devnet-steps">
+            <li><span><strong>Switch your wallet to Solana Devnet.</strong> Confirm the network inside the wallet before connecting; never test with mainnet funds.</span></li>
+            <li><span><strong>Fund a test wallet.</strong> Use an official Solana devnet faucet or wallet-supported faucet. Keep only test funds in this wallet.</span></li>
+            <li><span><strong>Prepare two test addresses.</strong> Use a sender wallet and a recipient wallet you control. Copy the recipient public address and verify every character.</span></li>
+            <li><span><strong>Test the preview first.</strong> Enter a small amount, check the asset, recipient, and optional message, and confirm that the page says “preview only” and sends nothing.</span></li>
+            <li><span><strong>Implement the devnet transaction separately.</strong> The next code milestone must explicitly target the devnet RPC, validate the address and amount, fetch the fee/balance, simulate the transaction, and display the full transfer details before requesting a wallet signature.</span></li>
+            <li><span><strong>Verify the result independently.</strong> After an approved test transfer is implemented and signed, check its signature and confirmation on Solana Explorer with the Devnet cluster selected. Record success only after confirmed status; test rejection and failure cases too.</span></li>
+          </ol>
+          <p><strong>Safety gate:</strong> do not switch this flow to mainnet or enable GFTM transfers until devnet tests pass, the token mint is independently verified, and transaction details are reviewed before every signature.</p>
+          <div class="devnet-links"><a class="button" style="border:1px solid #b8c7b8" href="https://faucet.solana.com/" target="_blank" rel="noopener noreferrer">Solana Devnet Faucet ↗</a><a class="button" style="border:1px solid #b8c7b8" href="https://explorer.solana.com/?cluster=devnet" target="_blank" rel="noopener noreferrer">Devnet Explorer ↗</a><a class="button" style="border:1px solid #b8c7b8" href="https://solana.com/docs" target="_blank" rel="noopener noreferrer">Solana Docs ↗</a></div>
+        </div>
+        <p class="gift-small">Safety: only use a recipient address you have independently verified. Never share your seed phrase or private key. Connecting a wallet does not authorize a transfer. Live gifting is not enabled here. Before launch, add a trusted Solana RPC, build and simulate transactions, show recipient/asset/amount/network/fee, request a separate wallet signature for each gift, verify confirmed signatures, and test failure/rejection paths. GFTM also requires a verified mint address and correct recipient token account.</p>
+      </div>
+    </section>
+    <section class="roadmap" id="roadmap">
+      <div class="section-head"><span class="eyebrow" style="color:#a52331">THE JOURNEY</span><h2>From snowflake to snowball</h2><p>A draft roadmap; dates and deliverables should only be marked complete after they really happen.</p></div>
+      <div class="roadmap-list">
+        <article class="phase"><div class="phase-num">1</div><div><h3>Santa's Workshop</h3><p>Confirm Giftmas branding, mascot, Solana setup, supply, and a clear community-first purpose.</p></div></article>
+        <article class="phase"><div class="phase-num">2</div><div><h3>Gifts That Give</h3><p>Plan digital collectibles and a transparent, optional charity concept with published rules and verifiable accounting before accepting donations.</p></div></article>
+        <article class="phase"><div class="phase-num">3</div><div><h3>Build and Launch Carefully</h3><p>Publish the site, test the Solana token setup, review security and legal obligations, and disclose costs before deciding whether to deploy.</p></div></article>
+      </div>
+    </section>
+    <section id="community">
+      <div class="section-head"><span class="eyebrow" style="color:#a52331">COME JOIN THE FESTIVITIES</span><h2>Give joy. Share the spirit.</h2><p>Giftmas brings together a festive community, potential digital gifts, and a carefully planned charity concept. Add official community links once they're live; these demo buttons are not connected to a real group.</p><div class="actions" style="justify-content:center"><a class="button primary" href="#" onclick="alert('Add your official Giftmas Telegram or Discord invite link here when ready.'); return false;">Join Giftmas Community ↗</a><a class="button" style="border:1px solid #b8c7b8" href="#token">Read Token Details</a></div></div>
+    </section>
+    <section style="padding-top:0">
+      <div class="section-head"><h2>Santa's FAQ</h2></div>
+      <div class="faq"><details><summary>Is the token already live?</summary><p>No. This is a website concept. A token address should only be added after deployment is actually completed and independently verified.</p></details><details><summary>Can I send an on-chain gift here now?</summary><p>A limited SOL test transfer can be submitted to Solana Devnet only through the separate test button after balance/fee checks, simulation, explicit confirmation, and wallet signing. Devnet SOL has no intended monetary value. Mainnet SOL gifting is not enabled, and the form's Review button alone only previews details. GFTM transfers require the correct deployed SPL-token mint and recipient token account, and remain disabled.</p></details><details><summary>Why is Giftmas token gifting disabled?</summary><p>The GFTM mint address and token deployment have not been verified. Keeping the option disabled prevents users from accidentally sending a different token that happens to use the same ticker. It should only be enabled after the mint and token details are confirmed.</p></details><details><summary>Can I build the website for free?</summary><p>Yes. A simple static website can be hosted on a free tier, subject to the host's current terms and limits. A custom domain, advanced services, or blockchain transactions may cost money.</p></details><details><summary>Will holders receive gifts or profits?</summary><p>No rewards or profits are promised. Any future gifting feature needs clear eligibility rules, funding, technical implementation, and applicable legal review.</p></details></div>
+    </section>
+  </main>
+  <footer><strong>GIFTMAS</strong><br>Christmas cheer, digital gifting, and giving back — with transparency.<br>This is a concept website, not financial advice or an offer to buy tokens. No token has been deployed through this website. Crypto assets are risky; never invest money you cannot afford to lose. Any charity activity must be verified before you contribute.</footer>
+</div>
+<script src="https://unpkg.com/@solana/web3.js@1.98.4/lib/index.iife.min.js"></script>
+<script>
+let pendingGift = null;
+const devnetConfirm = document.getElementById('devnet-confirm');
+const devnetSendButton = document.getElementById('devnet-send');
+const devnetStatus = document.getElementById('devnet-status');
+function updateDevnetButton() {
+  if (devnetSendButton) devnetSendButton.disabled = !(connectedProvider && pendingGift && devnetConfirm && devnetConfirm.checked);
+}
+document.getElementById('gift-form').addEventListener('submit', function (event) {
+  event.preventDefault();
+  const recipient = document.getElementById('recipient').value.trim();
+  const amount = Number(document.getElementById('amount').value);
+  const message = document.getElementById('message').value.trim();
+  const asset = document.getElementById('asset').value;
+  const status = document.getElementById('gift-status');
+  if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(recipient) || !Number.isFinite(amount) || amount < 0.001) {
+    pendingGift = null;
+    updateDevnetButton();
+    status.textContent = 'Please check the recipient address and enter an amount of at least 0.001 ' + asset + '.';
+    return;
+  }
+  pendingGift = asset === 'SOL' && amount <= 0.1 ? { recipient, amount, message } : null;
+  updateDevnetButton();
+  if (asset !== 'SOL') {
+    status.textContent = 'Gift preview only — GFTM transfers are disabled until the real token mint is deployed and verified. No transaction sent.';
+    devnetStatus.textContent = 'Devnet test transfers support SOL only. GFTM remains disabled.';
+    return;
+  }
+  status.textContent = 'Gift preview — no transaction sent yet. Asset: ' + asset + ' · Recipient: ' + recipient + ' · Amount: ' + amount.toLocaleString(undefined, { maximumFractionDigits: 9 }) + ' ' + asset + (message ? ' · Message: ' + message : '') + '. Verify the address carefully. The separate test button supports Devnet SOL only; mainnet and GFTM transfers remain disabled.';
+  devnetStatus.textContent = amount > 0.1 ? 'For this Devnet test, use 0.1 SOL or less. Reduce the amount and review the gift again.' : (connectedProvider ? 'Gift preview ready. Confirm the Devnet checkbox to enable the test-transfer button.' : 'Gift preview ready. Connect your wallet, confirm it is set to Devnet, then tick the test confirmation box.');
+});
+const connectButton = document.getElementById('connect-wallet');
+const disconnectButton = document.getElementById('disconnect-wallet');
+const walletState = document.getElementById('wallet-state');
+let connectedProvider = null;
+function showWallet(publicKey) {
+  walletState.textContent = publicKey ? 'Connected public address: ' + publicKey + ' · Address display only; no transaction has been authorized.' : 'Wallet not connected. Use a trusted wallet extension or compatible provider; this page never needs your recovery phrase.';
+  connectButton.disabled = Boolean(publicKey);
+  disconnectButton.disabled = !publicKey;
+  updateDevnetButton();
+}
+connectButton.addEventListener('click', async function () {
+  try {
+    const provider = window.phantom && window.phantom.solana ? window.phantom.solana : window.solana;
+    if (!provider || typeof provider.connect !== 'function') {
+      walletState.textContent = 'No compatible Solana wallet provider detected. Install or open your wallet from its official source, then try again.';
+      return;
+    }
+    if (provider.isPhantom === false && !window.solana) {
+      walletState.textContent = 'The detected provider is not recognized. For safety, use a wallet you trust and verify its official source.';
+      return;
+    }
+    const response = await provider.connect();
+    const publicKey = response && response.publicKey ? response.publicKey.toString() : (provider.publicKey ? provider.publicKey.toString() : '');
+    if (!publicKey) throw new Error('The wallet did not return a public address.');
+    connectedProvider = provider;
+    showWallet(publicKey);
+  } catch (error) {
+    walletState.textContent = error && error.code === 4001 ? 'Wallet connection was rejected. No transaction was sent.' : 'Could not connect. No transaction was sent. Check your wallet and try again.';
+  }
+});
+disconnectButton.addEventListener('click', async function () {
+  try { if (connectedProvider && typeof connectedProvider.disconnect === 'function') await connectedProvider.disconnect(); } catch (_) {}
+  connectedProvider = null;
+  showWallet('');
+});
+if (window.solana && window.solana.isConnected && window.solana.publicKey) {
+  connectedProvider = window.solana;
+  showWallet(window.solana.publicKey.toString());
+}
+if (devnetConfirm) devnetConfirm.addEventListener('change', updateDevnetButton);
+devnetSendButton.addEventListener('click', async function () {
+  if (!connectedProvider || !pendingGift || !devnetConfirm.checked) {
+    devnetStatus.textContent = 'Connect your wallet, review a SOL gift of 0.1 SOL or less, and confirm Devnet before continuing.';
+    updateDevnetButton();
+    return;
+  }
+  if (!window.solanaWeb3 || !window.solanaWeb3.Connection) {
+    devnetStatus.textContent = 'Solana transaction library did not load. No transaction was sent; check your connection and reload the page.';
+    return;
+  }
+  if (typeof connectedProvider.signTransaction !== 'function') {
+    devnetStatus.textContent = 'This wallet provider does not support the required transaction-signing flow. No transaction was sent.';
+    return;
+  }
+  const gift = pendingGift;
+  devnetSendButton.disabled = true;
+  try {
+    const web3 = window.solanaWeb3;
+    const connection = new web3.Connection(web3.clusterApiUrl('devnet'), 'confirmed');
+    const sender = new web3.PublicKey(connectedProvider.publicKey.toString());
+    const recipient = new web3.PublicKey(gift.recipient);
+    const lamports = Math.round(gift.amount * web3.LAMPORTS_PER_SOL);
+    if (!Number.isSafeInteger(lamports) || lamports < 1000000 || lamports > 100000000) throw new Error('Devnet test amount must be between 0.001 and 0.1 SOL.');
+    const balance = await connection.getBalance(sender, 'confirmed');
+    const latest = await connection.getLatestBlockhash('confirmed');
+    const transaction = new web3.Transaction({ feePayer: sender, recentBlockhash: latest.blockhash }).add(web3.SystemProgram.transfer({ fromPubkey: sender, toPubkey: recipient, lamports }));
+    const feeInfo = await connection.getFeeForMessage(transaction.compileMessage(), 'confirmed');
+    const estimatedFee = feeInfo && feeInfo.value != null ? feeInfo.value : 5000;
+    if (balance < lamports + estimatedFee) throw new Error('Insufficient Devnet SOL for the gift and estimated network fee. Get test SOL from the official faucet, then retry.');
+    const simulation = await connection.simulateTransaction(transaction);
+    if (simulation.value.err) throw new Error('Devnet simulation failed: ' + JSON.stringify(simulation.value.err));
+    const feeSol = estimatedFee / web3.LAMPORTS_PER_SOL;
+    devnetStatus.textContent = 'Ready for wallet signature. Network: Solana Devnet · Recipient: ' + recipient.toString() + ' · Amount: ' + gift.amount + ' SOL · Estimated fee: ' + feeSol + ' SOL. Review the wallet prompt carefully.';
+    if (!window.confirm('DEVNET TEST ONLY\n\nSend ' + gift.amount + ' test SOL to ' + recipient.toString() + '?\nEstimated network fee: ' + feeSol + ' SOL.\nThis page broadcasts only to the Solana Devnet RPC. Continue to wallet signing?')) {
+      devnetStatus.textContent = 'Cancelled by you. No transaction was sent.';
+      return;
+    }
+    const signedTransaction = await connectedProvider.signTransaction(transaction);
+    const signature = await connection.sendRawTransaction(signedTransaction.serialize(), { skipPreflight: false, preflightCommitment: 'confirmed' });
+    devnetStatus.textContent = 'Submitted to Devnet; waiting for confirmation… Signature: ' + signature;
+    const confirmation = await connection.confirmTransaction({ signature, blockhash: latest.blockhash, lastValidBlockHeight: latest.lastValidBlockHeight }, 'confirmed');
+    if (confirmation.value.err) throw new Error('The network returned a transaction error. Check the signature on Devnet Explorer: ' + signature);
+    devnetStatus.innerHTML = 'Devnet test transfer confirmed. Signature: <a href="https://explorer.solana.com/tx/' + encodeURIComponent(signature) + '?cluster=devnet" target="_blank" rel="noopener noreferrer">View on Solana Devnet Explorer ↗</a>. This is a test transfer, not a mainnet payment.';
+    pendingGift = null;
+    document.getElementById('gift-status').textContent = 'Devnet test transfer confirmed. No mainnet transaction was sent. You can review another test gift when ready.';
+  } catch (error) {
+    devnetStatus.textContent = 'Devnet test did not complete: ' + (error && error.message ? error.message : 'Unknown error') + '. Check the wallet and Devnet Explorer before retrying; do not assume a transfer succeeded.';
+  } finally {
+    updateDevnetButton();
+  }
+});
+</script>
+</body>
+</html>
